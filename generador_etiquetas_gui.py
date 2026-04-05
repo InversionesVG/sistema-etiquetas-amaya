@@ -577,7 +577,9 @@ class EtiquetasApp(QMainWindow):
     def initUI(self):
         """Crear la interfaz gráfica"""
         self.setWindowTitle("Generador de Etiquetas - Amaya Express")
-        self.setGeometry(100, 100, 900, 700)
+        
+        # Abrir maximizada
+        self.showMaximized()
         
         # Widget central
         central_widget = QWidget()
@@ -863,8 +865,7 @@ class EtiquetasApp(QMainWindow):
             # Mostrar productos en la interfaz
             self.mostrar_productos()
             
-            QMessageBox.information(self, "Éxito", 
-                f"Se cargaron {len(self.productos)} productos correctamente.")
+            # Mensaje eliminado para no retrasar el flujo
         
         except Exception as e:
             QMessageBox.critical(self, "Error", 
