@@ -1,0 +1,53 @@
+# Archivos de Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Archivos del sistema
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Archivos generados (PDFs)
+*.pdf
+
+# Excel temporal
+Etiquetas_Para_Imprimir.xlsx
+
+# Archivos específicos del usuario
+# NO subir el Excel con datos reales del cliente
+Base_Datos_Etiquetas_FDA.xlsx
+
+# Mantener solo el ejemplo
+!Base_Datos_Etiquetas_FDA_EJEMPLO.xlsx
