@@ -578,9 +578,6 @@ class EtiquetasApp(QMainWindow):
         """Crear la interfaz gráfica"""
         self.setWindowTitle("Generador de Etiquetas - Amaya Express")
         
-        # Abrir maximizada
-        self.showMaximized()
-        
         # Widget central
         central_widget = QWidget()
         self.setCentralWidget(central_widget)
@@ -822,6 +819,9 @@ class EtiquetasApp(QMainWindow):
         self.btn_generar.clicked.connect(self.generar_pdf)
         self.btn_generar.setEnabled(False)
         main_layout.addWidget(self.btn_generar)
+        
+        # Maximizar ventana al final (después de crear toda la interfaz)
+        self.showMaximized()
     
     def cargar_productos(self):
         """Cargar productos desde el Excel"""
