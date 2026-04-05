@@ -7,6 +7,38 @@ y este proyecto adhiere a [Versionamiento Semántico](https://semver.org/lang/es
 
 ---
 
+## [1.1.0] - 2026-04-05
+
+### 🎉 Mejoras en PLS-504
+
+#### Agregado
+- ✅ **Ingredientes completos** en etiqueta PLS-504
+- ✅ **Allergens** después de ingredientes
+- ✅ **Bandera de El Salvador** debajo de "Imported by"
+- ✅ **Nutrition Facts COMPLETA** con todos los nutrientes:
+  - Total Fat, Saturated Fat, Trans Fat
+  - Cholesterol, Sodium
+  - Total Carbohydrate, Dietary Fiber, Total Sugars, Added Sugars
+  - Protein
+  - Vitamin D, Calcium, Iron, Potassium
+  - Leyenda del asterisco
+- ✅ **Texto azul** en tabla nutricional (#0066B3)
+- ✅ Redistribución de espacio: 40% izquierda, 60% derecha
+- ✅ Letras más grandes (3.2pt) para mejor legibilidad
+- ✅ Ajuste de filas 4 y 5 independiente
+
+#### Cambiado
+- Cuadro Nutrition Facts más ajustado (sin espacio vacío inferior)
+- Mayor separación vertical entre nutrientes
+- Correo electrónico en una sola línea
+- Labels acortados ("Fat" en vez de "Total Fat", etc.)
+
+#### Corregido
+- 🐛 Bug de variable "dv" en sección Protein
+- 🐛 Allergens ahora muestra título correcto
+
+---
+
 ## [1.0.0] - 2026-04-05
 
 ### 🎉 Versión Inicial - Lanzamiento
@@ -143,4 +175,4 @@ git checkout v1.0.0
 ---
 
 **Última actualización:** 2026-04-05  
-**Versión actual:** 1.0.0
+**Versión actual:** 1.1.0

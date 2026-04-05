@@ -4,7 +4,7 @@ Sistema profesional para generar etiquetas nutricionales FDA en formatos Avery 8
 
 ![Python](https://img.shields.io/badge/python-3.8+-blue.svg)
 ![PyQt5](https://img.shields.io/badge/PyQt5-5.15-green.svg)
-![Version](https://img.shields.io/badge/version-1.0.0-brightgreen.svg)
+![Version](https://img.shields.io/badge/version-1.1.0-brightgreen.svg)
 ![License](https://img.shields.io/badge/license-Privado-red.svg)
 
 ---
@@ -66,6 +66,7 @@ Aplicación de escritorio con interfaz gráfica (GUI) que permite:
    - `Generador_Etiquetas_Amaya.exe` (ejecutable)
    - `Base_Datos_Etiquetas_FDA.xlsx` (base de datos)
    - `Amaya_Imagen.png` (logo)
+   - `Flag_El_Salvador.png` (bandera)
    - `Fondo_Superior.png` (fondo amarillo)
    - `Fondo_Inferior.png` (fondo azul)
 
@@ -408,7 +409,7 @@ Ver `CHANGELOG.md` para más detalles sobre versionamiento.
 
 Ver archivo `CHANGELOG.md` para historial completo de versiones.
 
-**Versión actual:** 1.0.0  
+**Versión actual:** 1.1.0  
 **Última actualización:** Abril 2026
 
 ---
@@ -668,5 +669,5 @@ pip3 install PyQt5
 
 ---
 
-**Versión:** 1.0  
+**Versión:** 1.1  
 **Última actualización:** Abril 2026
