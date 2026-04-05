@@ -885,8 +885,13 @@ class EtiquetasApp(QMainWindow):
         # Filtrar productos
         productos_filtrados = []
         for i, producto in enumerate(self.productos):
-            nombre = producto.get('Product_Name', '').lower()
-            if filtro == "" or filtro in nombre:
+            nombre = producto.get('Product_Name', '')
+            # Validar que nombre no sea None antes de usar .lower()
+            if nombre and str(nombre).strip():
+                nombre = str(nombre).lower()
+                if filtro == "" or filtro in nombre:
+                    productos_filtrados.append((i, producto))
+            elif filtro == "":  # Si no tiene nombre pero no hay filtro, incluirlo
                 productos_filtrados.append((i, producto))
         
         # Si no hay resultados, mostrar mensaje
