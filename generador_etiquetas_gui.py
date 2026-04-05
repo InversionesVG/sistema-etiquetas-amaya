@@ -8,7 +8,6 @@ Versión: 1.0
 import sys
 import os
 import platform
-import tempfile
 from datetime import datetime
 from PyQt5.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
@@ -25,6 +24,12 @@ from reportlab.lib.units import inch
 from reportlab.pdfgen import canvas
 from reportlab.lib.colors import HexColor, black
 import re
+
+# ============================================================================
+# INFORMACIÓN DE VERSIÓN
+# ============================================================================
+VERSION = "1.0.0"  # Formato: MAYOR.MENOR.PARCHE
+VERSION_DATE = "Abril 2026"
 
 # ============================================================================
 # CONFIGURACIÓN DE RUTAS (MULTIPLATAFORMA)
@@ -577,7 +582,7 @@ class EtiquetasApp(QMainWindow):
     
     def initUI(self):
         """Crear la interfaz gráfica"""
-        self.setWindowTitle("Generador de Etiquetas - Amaya Express")
+        self.setWindowTitle(f"Generador de Etiquetas - Amaya Express v{VERSION}")
         
         # Widget central
         central_widget = QWidget()
@@ -623,6 +628,19 @@ class EtiquetasApp(QMainWindow):
         """)
         header_title.setAlignment(Qt.AlignCenter)
         header_layout.addWidget(header_title, stretch=1)
+        
+        # Versión (derecha)
+        version_label = QLabel(f"v{VERSION}")
+        version_label.setStyleSheet("""
+            QLabel {
+                background-color: transparent;
+                color: rgba(255, 255, 255, 0.7);
+                font-size: 11px;
+                padding: 10px;
+            }
+        """)
+        version_label.setAlignment(Qt.AlignRight | Qt.AlignTop)
+        header_layout.addWidget(version_label)
         
         main_layout.addWidget(header_container)
         
@@ -1063,10 +1081,9 @@ class EtiquetasApp(QMainWindow):
             
             cfg = LABEL_CONFIGS[label_type]
             
-            # Generar archivo temporal (se borrará automáticamente)
+            # Generar nombre de archivo con timestamp
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            temp_dir = tempfile.gettempdir()
-            pdf_filename = os.path.join(temp_dir, f"Etiquetas_{timestamp}.pdf")
+            pdf_filename = os.path.join(BASE_DIR, f"Etiquetas_{timestamp}.pdf")
             
             # Crear PDF
             c = canvas.Canvas(pdf_filename, pagesize=letter, 
