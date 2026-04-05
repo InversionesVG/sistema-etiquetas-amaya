@@ -8,6 +8,7 @@ Versión: 1.0
 import sys
 import os
 import platform
+import tempfile
 from datetime import datetime
 from PyQt5.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
@@ -1062,9 +1063,10 @@ class EtiquetasApp(QMainWindow):
             
             cfg = LABEL_CONFIGS[label_type]
             
-            # Generar nombre de archivo con timestamp
+            # Generar archivo temporal (se borrará automáticamente)
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            pdf_filename = os.path.join(BASE_DIR, f"Etiquetas_{timestamp}.pdf")
+            temp_dir = tempfile.gettempdir()
+            pdf_filename = os.path.join(temp_dir, f"Etiquetas_{timestamp}.pdf")
             
             # Crear PDF
             c = canvas.Canvas(pdf_filename, pagesize=letter, 
