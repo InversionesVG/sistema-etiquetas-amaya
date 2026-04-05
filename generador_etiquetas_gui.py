@@ -873,26 +873,30 @@ class EtiquetasApp(QMainWindow):
     
     def mostrar_productos(self):
         """Mostrar productos en la interfaz"""
-        # Limpiar layout anterior
+        # Limpiar layout anterior correctamente
         for i in reversed(range(self.productos_layout.count())): 
-            self.productos_layout.itemAt(i).widget().setParent(None)
+            widget = self.productos_layout.itemAt(i).widget()
+            if widget is not None:
+                widget.deleteLater()
         
         self.checkboxes = []
         self.spinboxes = []
         
         # Obtener filtro de búsqueda (si existe)
-        filtro = self.search_input.text().lower() if hasattr(self, 'search_input') else ""
+        filtro = ""
+        if hasattr(self, 'search_input'):
+            filtro = self.search_input.text().lower().strip()
         
         # Filtrar productos
         productos_filtrados = []
         for i, producto in enumerate(self.productos):
-            nombre = producto.get('Product_Name', '')
-            # Validar que nombre no sea None antes de usar .lower()
-            if nombre and str(nombre).strip():
-                nombre = str(nombre).lower()
-                if filtro == "" or filtro in nombre:
-                    productos_filtrados.append((i, producto))
-            elif filtro == "":  # Si no tiene nombre pero no hay filtro, incluirlo
+            nombre = str(producto.get('Product_Name', '')).lower().strip()
+            
+            # Si no hay filtro, incluir todos
+            if not filtro:
+                productos_filtrados.append((i, producto))
+            # Si hay filtro, solo incluir si coincide
+            elif filtro in nombre:
                 productos_filtrados.append((i, producto))
         
         # Si no hay resultados, mostrar mensaje
