@@ -1,10 +1,10 @@
 # 🏷️ Sistema de Generación de Etiquetas FDA - Amaya Express
 
-Sistema profesional para generar etiquetas nutricionales FDA en formatos Avery 8164, Lácteo Avery 8164 y PLS 504.
+Sistema profesional para generar etiquetas nutricionales FDA en formatos Avery 8164, Lácteo Avery 8164, Lácteo San Julián y PLS 504.
 
 ![Python](https://img.shields.io/badge/python-3.8+-blue.svg)
 ![PyQt5](https://img.shields.io/badge/PyQt5-5.15-green.svg)
-![Version](https://img.shields.io/badge/version-1.1.0-brightgreen.svg)
+![Version](https://img.shields.io/badge/version-1.2.0-brightgreen.svg)
 ![License](https://img.shields.io/badge/license-Privado-red.svg)
 
 ---
@@ -17,7 +17,7 @@ Aplicación de escritorio con interfaz gráfica (GUI) que permite:
 - ✅ Elegir cantidades y tipo de etiqueta
 - ✅ Validación obligatoria de tipo de etiqueta
 - ✅ Generar PDFs listos para imprimir
-- ✅ Soporta 3 tipos de etiquetas (Avery 8164, Lácteo, PLS 504)
+- ✅ Soporta 4 tipos de etiquetas (Avery 8164, Lácteo Avery, Lácteo San Julián, PLS 504)
 - ✅ PDFs temporales (no se acumulan archivos)
 - ✅ Compatible con Windows y Mac
 - ✅ Control de versiones integrado
@@ -42,7 +42,18 @@ Aplicación de escritorio con interfaz gráfica (GUI) que permite:
 - Logo Amaya + cuadro de peso azul oscuro
 - Información de contacto completa
 
-### 3. **PLS 504** (Pequeña)
+### 3. **Lacteo San Julian** (Vertical rotada - San Julián) 🆕
+- Tamaño: 3.33" × 4" (diseño vertical rotado 90°)
+- 6 etiquetas por hoja (2 columnas × 3 filas)
+- Fondo degradado azul (claro → oscuro)
+- Logo San Julián (vaca con queso)
+- Sello verde "Sabor San Julián - El Original - Desde 1986"
+- Product_Name grande (16pt) y Product_Name_English (11pt cursiva)
+- Nutrition Facts COMPLETA (todos los nutrientes)
+- Fecha de vencimiento (solo fecha, sin hora)
+- Sin información de contacto
+
+### 4. **PLS 504** (Pequeña)
 - Tamaño: 3" × 2"
 - 10 etiquetas por hoja (2 columnas × 5 filas)
 - Diseño compacto
@@ -65,14 +76,22 @@ Aplicación de escritorio con interfaz gráfica (GUI) que permite:
 1. **Descargar archivos necesarios:**
    - `Generador_Etiquetas_Amaya.exe` (ejecutable)
    - `Base_Datos_Etiquetas_FDA.xlsx` (base de datos)
-   - `Amaya_Imagen.png` (logo)
+   - `Amaya_Imagen.png` (logo Amaya)
    - `Flag_El_Salvador.png` (bandera)
    - `Fondo_Superior.png` (fondo amarillo)
    - `Fondo_Inferior.png` (fondo azul)
+   - `Logo_San_Julian_Vaca.png` (logo San Julián) 🆕
+   - `Sello_Verde_San_Julian.png` (sello San Julián) 🆕
+   - `Fondo_Azul_San_Julian.png` (fondo degradado azul) 🆕
 
 2. **Crear carpeta:**
    ```
    C:\Sistema_Etiquetas\
+   ```
+   
+   **IMPORTANTE:** En Mac la ruta es:
+   ```
+   ~/Documents/Sistema_Etiquetas/Win/
    ```
 
 3. **Copiar todos los archivos a esa carpeta**
@@ -112,8 +131,12 @@ Aplicación de escritorio con interfaz gráfica (GUI) que permite:
    - Copia a `C:\Sistema_Etiquetas\`:
      - `Base_Datos_Etiquetas_FDA.xlsx`
      - `Amaya_Imagen.png`
+     - `Flag_El_Salvador.png`
      - `Fondo_Superior.png`
      - `Fondo_Inferior.png`
+     - `Logo_San_Julian_Vaca.png` 🆕
+     - `Sello_Verde_San_Julian.png` 🆕
+     - `Fondo_Azul_San_Julian.png` 🆕
 
 6. **Ejecutar:**
    ```cmd
@@ -136,10 +159,17 @@ Aplicación de escritorio con interfaz gráfica (GUI) que permite:
    ```
 
 3. **Configurar archivos:**
-   ```bash
-   mkdir -p ~/Sistema_Etiquetas
-   # Copiar archivos necesarios a ~/Sistema_Etiquetas/
-   ```
+   - Copia los siguientes archivos a `~/Documents/Sistema_Etiquetas/Win/`:
+     - `Base_Datos_Etiquetas_FDA.xlsx`
+     - `Amaya_Imagen.png`
+     - `Flag_El_Salvador.png`
+     - `Fondo_Superior.png`
+     - `Fondo_Inferior.png`
+     - `Logo_San_Julian_Vaca.png` 🆕
+     - `Sello_Verde_San_Julian.png` 🆕
+     - `Fondo_Azul_San_Julian.png` 🆕
+   
+   **Nota:** La ruta correcta es `~/Documents/Sistema_Etiquetas/Win/` (no `~/Sistema_Etiquetas/`)
 
 4. **Ejecutar:**
    ```bash
@@ -152,12 +182,17 @@ Aplicación de escritorio con interfaz gráfica (GUI) que permite:
 
 ### **Para Usuario Final:**
 ```
-C:\Sistema_Etiquetas\
-├── Generador_Etiquetas_Amaya.exe  ← Ejecutable (doble clic)
-├── Base_Datos_Etiquetas_FDA.xlsx  ← Base de datos
-├── Amaya_Imagen.png                ← Logo
-├── Fondo_Superior.png              ← Fondo amarillo
-└── Fondo_Inferior.png              ← Fondo azul
+C:\Sistema_Etiquetas\  (Windows)
+~/Documents/Sistema_Etiquetas/Win/  (Mac)
+├── Generador_Etiquetas_Amaya.exe      ← Ejecutable (solo Windows)
+├── Base_Datos_Etiquetas_FDA.xlsx      ← Base de datos
+├── Amaya_Imagen.png                   ← Logo Amaya
+├── Flag_El_Salvador.png               ← Bandera El Salvador
+├── Fondo_Superior.png                 ← Fondo amarillo (Lacteo Avery)
+├── Fondo_Inferior.png                 ← Fondo azul (Lacteo Avery)
+├── Logo_San_Julian_Vaca.png          ← Logo San Julián 🆕
+├── Sello_Verde_San_Julian.png        ← Sello San Julián 🆕
+└── Fondo_Azul_San_Julian.png         ← Fondo degradado azul 🆕
 ```
 
 ### **Para Desarrollo:**

@@ -7,6 +7,46 @@ y este proyecto adhiere a [Versionamiento Semántico](https://semver.org/lang/es
 
 ---
 
+## [1.2.0] - 2026-05-07
+
+### 🎉 Nueva Etiqueta: Lacteo San Julian
+
+#### Agregado
+- ✅ **Nuevo tipo de etiqueta:** Lacteo San Julian (6 por hoja - Vertical rotada)
+- ✅ **Diseño vertical rotado 90°** para aprovechar espacio horizontal tipo Lacteo Avery
+- ✅ **Fondo degradado azul** (azul claro arriba → azul oscuro abajo)
+- ✅ **Logo San Julián** (vaca con queso) en centro superior
+- ✅ **Sello verde "Sabor San Julián"** con franja naranja "El Original - Desde 1986"
+- ✅ **Nutrition Facts COMPLETA** (no compacta) con todos los nutrientes
+- ✅ **Textos superiores:** "Keep refrigerated / Pasteurizado"
+- ✅ **Tres nuevas imágenes:**
+  - `Logo_San_Julian_Vaca.png` - Logo de la vaca
+  - `Sello_Verde_San_Julian.png` - Sello circular verde
+  - `Fondo_Azul_San_Julian.png` - Degradado azul
+- ✅ **Nueva función:** `dibujar_lacteo_san_julian()` (320 líneas)
+- ✅ **Nueva configuración:** `LACTEO_SAN_JULIAN` en LABEL_CONFIGS
+
+#### Cambiado
+- Versión actualizada a 1.2.0
+- Índice de PLS504 cambió de 3 a 4 (por nuevo tipo en medio)
+- Cálculo de hojas actualizado para incluir San Julián
+- Mensajes de validación actualizados con nuevo tipo
+
+#### Detalles de Diseño San Julián
+- **Sección superior:** Logo + nombre producto (español e inglés)
+- **Sección inferior dividida:**
+  - Izquierda (45%): Sello verde + Ingredientes + Allergens + Peso + País + Fecha vencimiento
+  - Derecha (55%): Nutrition Facts completa FDA
+- **NO incluye:** Datos de contacto ni bandera El Salvador
+- **Fecha de vencimiento:** Solo muestra fecha (sin hora), ubicada 2 líneas debajo de "Product of El Salvador"
+
+#### Observaciones Técnicas
+- Rotación implementada con `c.saveState()` / `c.restoreState()` / `c.rotate(90)`
+- Usa mismas medidas físicas que Lacteo Avery 8164 (4" × 3.33")
+- Código agregado sin modificar funciones existentes
+
+---
+
 ## [1.1.0] - 2026-04-05
 
 ### 🎉 Mejoras en PLS-504

@@ -28,8 +28,8 @@ import re
 # ============================================================================
 # INFORMACIÓN DE VERSIÓN
 # ============================================================================
-VERSION = "1.2.0"  # Formato: MAYOR.MENOR.PARCHE
-VERSION_DATE = "Mayo 2026"
+VERSION = "1.1.0"  # Formato: MAYOR.MENOR.PARCHE
+VERSION_DATE = "Abril 2026"
 
 # ============================================================================
 # CONFIGURACIÓN DE RUTAS (MULTIPLATAFORMA)
@@ -51,11 +51,6 @@ FLAG_PATH = os.path.join(BASE_DIR, "Flag_El_Salvador.png")
 FONDO_SUPERIOR_PATH = os.path.join(BASE_DIR, "Fondo_Superior.png")
 FONDO_INFERIOR_PATH = os.path.join(BASE_DIR, "Fondo_Inferior.png")
 
-# Rutas para San Julián
-LOGO_SAN_JULIAN_PATH = os.path.join(BASE_DIR, "Logo_San_Julian_Vaca.png")
-SELLO_SAN_JULIAN_PATH = os.path.join(BASE_DIR, "Sello_Verde_San_Julian.png")
-FONDO_AZUL_SAN_JULIAN_PATH = os.path.join(BASE_DIR, "Fondo_Azul_San_Julian.png")
-
 # ============================================================================
 # CONFIGURACIÓN DE ETIQUETAS (de tu código original)
 # ============================================================================
@@ -66,11 +61,6 @@ LABEL_CONFIGS = {
         'h_spacing': 0.85 * inch, 'v_spacing': -0.68 * inch,
     },
     'LACTEO_AVERY_8164': {
-        'width': 4 * inch, 'height': 3.33 * inch, 'columns': 2, 'rows': 3, 'per_page': 6,
-        'margin_left': 0.16 * inch, 'margin_top': 0.48 * inch,    
-        'h_spacing': 0.18 * inch, 'v_spacing': 0.05 * inch,
-    },
-    'LACTEO_SAN_JULIAN': {
         'width': 4 * inch, 'height': 3.33 * inch, 'columns': 2, 'rows': 3, 'per_page': 6,
         'margin_left': 0.16 * inch, 'margin_top': 0.48 * inch,    
         'h_spacing': 0.18 * inch, 'v_spacing': 0.05 * inch,
@@ -928,337 +918,6 @@ def dibujar_pls(c, x, y, p, cfg):
         c.drawString(nf_x + 2, yp_nf, linea.strip())
 
 
-def dibujar_lacteo_san_julian(c, x, y, p, cfg):
-    """
-    Dibujar etiqueta San Julián - Diseño vertical rotado 90°
-    Basado en Lacteo Avery 8164 pero con diseño San Julián
-    
-    IMPORTANTE: La etiqueta se diseña vertical (3.33" x 4") pero se rota 90°
-    para usar el espacio horizontal de Lacteo Avery 8164 (4" x 3.33")
-    """
-    
-    # ROTAR EL CANVAS 90 GRADOS
-    # Guardamos el estado actual del canvas
-    c.saveState()
-    
-    # La etiqueta vertical real será: ancho_real=3.33", alto_real=4"
-    ancho_real = 3.33 * inch
-    alto_real = 4 * inch
-    
-    # Trasladar y rotar para que la etiqueta vertical ocupe el espacio horizontal
-    c.translate(x + cfg['width'], y)
-    c.rotate(90)
-    
-    # Ahora trabajamos en un espacio de 3.33" (ancho) × 4" (alto)
-    # Las coordenadas (0, 0) están en la esquina inferior izquierda de la etiqueta rotada
-    
-    # ========================================================================
-    # FONDO DEGRADADO AZUL
-    # ========================================================================
-    if os.path.exists(FONDO_AZUL_SAN_JULIAN_PATH):
-        c.drawImage(FONDO_AZUL_SAN_JULIAN_PATH, 
-                    0, 0,  # Esquina inferior izquierda
-                    width=ancho_real, 
-                    height=alto_real,
-                    preserveAspectRatio=False, 
-                    mask='auto')
-    
-    # ========================================================================
-    # CONTENIDO DE LA ETIQUETA (de arriba hacia abajo)
-    # ========================================================================
-    
-    yp = alto_real - PADDING * 0.5  # Empezar desde arriba
-    
-    # ------------------------------------------------------------------------
-    # 1. TEXTOS SUPERIORES: "Keep refrigerated / Pasteurizado"
-    # ------------------------------------------------------------------------
-    c.setFillColor(HexColor('#FFFFFF'))  # Texto blanco sobre azul
-    c.setFont("Helvetica-Bold", 7)
-    
-    keep_text = "Keep refrigerated"
-    text_width = c.stringWidth(keep_text, "Helvetica-Bold", 7)
-    c.drawString((ancho_real - text_width) / 2, yp, keep_text)
-    yp -= 8
-    
-    pasterizado_text = "Pasteurizado"
-    text_width = c.stringWidth(pasterizado_text, "Helvetica-Bold", 7)
-    c.drawString((ancho_real - text_width) / 2, yp, pasterizado_text)
-    yp -= 15
-    
-    # ------------------------------------------------------------------------
-    # 2. LOGO SAN JULIÁN (Vaca con nombre)
-    # ------------------------------------------------------------------------
-    if os.path.exists(LOGO_SAN_JULIAN_PATH):
-        logo_size = 0.6 * inch
-        logo_x = (ancho_real - logo_size) / 2
-        c.drawImage(LOGO_SAN_JULIAN_PATH, 
-                    logo_x, yp - logo_size,
-                    logo_size, logo_size, 
-                    preserveAspectRatio=True, 
-                    mask='auto')
-        yp -= logo_size + 0.1 * inch
-    
-    # ------------------------------------------------------------------------
-    # 3. NOMBRE DEL PRODUCTO (español - grande)
-    # ------------------------------------------------------------------------
-    c.setFillColor(HexColor('#FFFFFF'))  # Blanco
-    nombre_producto = p.get('Product_Name', '')
-    c.setFont("Helvetica-Bold", 16)
-    
-    # Si es muy largo, dividir en dos líneas
-    max_width_nombre = ancho_real - PADDING
-    if c.stringWidth(nombre_producto, "Helvetica-Bold", 16) > max_width_nombre:
-        palabras = nombre_producto.split()
-        linea1 = ""
-        linea2 = ""
-        for palabra in palabras:
-            test = linea1 + palabra + " "
-            if c.stringWidth(test, "Helvetica-Bold", 16) < max_width_nombre:
-                linea1 = test
-            else:
-                linea2 += palabra + " "
-        
-        # Dibujar línea 1
-        text_width = c.stringWidth(linea1.strip(), "Helvetica-Bold", 16)
-        c.drawString((ancho_real - text_width) / 2, yp, linea1.strip())
-        yp -= 18
-        
-        # Dibujar línea 2
-        if linea2:
-            text_width = c.stringWidth(linea2.strip(), "Helvetica-Bold", 16)
-            c.drawString((ancho_real - text_width) / 2, yp, linea2.strip())
-            yp -= 18
-    else:
-        text_width = c.stringWidth(nombre_producto, "Helvetica-Bold", 16)
-        c.drawString((ancho_real - text_width) / 2, yp, nombre_producto)
-        yp -= 18
-    
-    # ------------------------------------------------------------------------
-    # 4. NOMBRE EN INGLÉS (Product_Name_English - cursiva)
-    # ------------------------------------------------------------------------
-    nombre_eng = p.get('Product_Name_English', '')
-    if nombre_eng and str(nombre_eng).strip() != 'None':
-        c.setFont("Helvetica-Oblique", 11)
-        text_width = c.stringWidth(nombre_eng, "Helvetica-Oblique", 11)
-        c.drawString((ancho_real - text_width) / 2, yp, nombre_eng)
-        yp -= 15
-    
-    yp -= 10  # Espacio adicional antes de la sección inferior
-    
-    # ========================================================================
-    # SECCIÓN INFERIOR: Dividida en dos columnas
-    # Izquierda: Sello + Ingredientes + Allergens + Peso
-    # Derecha: Nutrition Facts COMPLETA
-    # ========================================================================
-    
-    # Definir anchos de columnas
-    ancho_izquierda = ancho_real * 0.45
-    ancho_derecha = ancho_real * 0.55
-    x_derecha = ancho_izquierda
-    
-    # Altura disponible para la sección inferior
-    altura_inferior = yp - PADDING * 0.5
-    y_inicio_inferior = PADDING * 0.5
-    
-    # ------------------------------------------------------------------------
-    # COLUMNA IZQUIERDA
-    # ------------------------------------------------------------------------
-    yp_izq = altura_inferior + y_inicio_inferior
-    
-    # SELLO VERDE "Sabor San Julián"
-    if os.path.exists(SELLO_SAN_JULIAN_PATH):
-        sello_size = 0.45 * inch
-        sello_x = PADDING * 0.3
-        c.drawImage(SELLO_SAN_JULIAN_PATH, 
-                    sello_x, yp_izq - sello_size,
-                    sello_size, sello_size, 
-                    preserveAspectRatio=True, 
-                    mask='auto')
-        yp_izq -= sello_size + 0.05 * inch
-    
-    # INGREDIENTES
-    c.setFillColor(HexColor('#FFFFFF'))
-    c.setFont("Helvetica-Bold", 4.5)
-    c.drawString(PADDING * 0.3, yp_izq, "INGREDIENTS:")
-    yp_izq -= 5
-    
-    c.setFont("Helvetica", 4)
-    ingredientes = str(p.get('Ingredients', ''))
-    max_width_ing = ancho_izquierda - PADDING * 0.6
-    linea = ""
-    for palabra in ingredientes.split():
-        test = linea + palabra + " "
-        if c.stringWidth(test, "Helvetica", 4) < max_width_ing:
-            linea = test
-        else:
-            c.drawString(PADDING * 0.3, yp_izq, linea.strip())
-            yp_izq -= 4.5
-            linea = palabra + " "
-    if linea:
-        c.drawString(PADDING * 0.3, yp_izq, linea.strip())
-    yp_izq -= 7
-    
-    # ALLERGENS
-    allergens = p.get('Allergens', '')
-    if allergens and str(allergens).strip() != 'None':
-        c.setFont("Helvetica-Bold", 4.5)
-        c.drawString(PADDING * 0.3, yp_izq, str(allergens))
-        yp_izq -= 7
-    
-    # PESO NETO
-    c.setFont("Helvetica-Bold", 5)
-    peso_text = f"Net Wt: {p.get('Net_Weight', '')}"
-    c.drawString(PADDING * 0.3, yp_izq, peso_text)
-    yp_izq -= 7
-    
-    # PRODUCT OF EL SALVADOR
-    c.setFont("Helvetica", 4.5)
-    c.drawString(PADDING * 0.3, yp_izq, "Product of El Salvador")
-    yp_izq -= 10  # 2 líneas de espacio
-    
-    # FECHA DE VENCIMIENTO (solo fecha, sin hora)
-    c.setFont("Helvetica-Bold", 5)
-    exp_date = str(p.get('Expiration_Date', ''))
-    # Si la fecha tiene hora (formato con espacio), tomar solo la parte de la fecha
-    if ' ' in exp_date:
-        exp_date = exp_date.split(' ')[0]
-    exp_text = f"EXP: {exp_date}"
-    c.drawString(PADDING * 0.3, yp_izq, exp_text)
-    
-    # ------------------------------------------------------------------------
-    # COLUMNA DERECHA: NUTRITION FACTS COMPLETA
-    # ------------------------------------------------------------------------
-    nf_x = x_derecha + PADDING * 0.2
-    nf_y = y_inicio_inferior + 0.1 * inch
-    nf_width = ancho_derecha - PADDING * 0.4
-    nf_height = altura_inferior - 0.2 * inch
-    
-    # Borde de Nutrition Facts (fondo blanco)
-    c.setFillColor(HexColor('#FFFFFF'))
-    c.setStrokeColor(black)
-    c.setLineWidth(1.5)
-    c.rect(nf_x, nf_y, nf_width, nf_height, fill=1, stroke=1)
-    
-    # Contenido de Nutrition Facts
-    c.setFillColor(black)
-    c.setLineWidth(0.3)
-    yp_nf = nf_y + nf_height - 4
-    
-    # Título
-    c.setFont("Helvetica-Bold", 6)
-    c.drawString(nf_x + 2, yp_nf, "Nutrition Facts")
-    yp_nf -= 1
-    c.setLineWidth(0.8)
-    c.line(nf_x + 2, yp_nf, nf_x + nf_width - 2, yp_nf)
-    c.setLineWidth(0.3)
-    yp_nf -= 4
-    
-    # Servings
-    c.setFont("Helvetica", 4)
-    servings = p.get('Servings_Per_Container', '')
-    if servings and str(servings).strip() != 'None':
-        c.drawString(nf_x + 2, yp_nf, f"Servings: {servings}")
-        yp_nf -= 4
-    
-    # Serving Size
-    c.setFont("Helvetica-Bold", 4)
-    serving_size = p.get('Serving_Size', '')
-    c.drawString(nf_x + 2, yp_nf, f"Serving size")
-    c.drawRightString(nf_x + nf_width - 2, yp_nf, str(serving_size))
-    yp_nf -= 1
-    c.setLineWidth(1.2)
-    c.line(nf_x + 2, yp_nf, nf_x + nf_width - 2, yp_nf)
-    c.setLineWidth(0.3)
-    yp_nf -= 4
-    
-    # Calories
-    c.setFont("Helvetica-Bold", 3.5)
-    c.drawString(nf_x + 2, yp_nf, "Calories")
-    c.setFont("Helvetica-Bold", 6)
-    calories = p.get('Calories', '')
-    c.drawRightString(nf_x + nf_width - 2, yp_nf, str(calories))
-    yp_nf -= 1
-    c.setLineWidth(1)
-    c.line(nf_x + 2, yp_nf, nf_x + nf_width - 2, yp_nf)
-    c.setLineWidth(0.3)
-    yp_nf -= 3
-    
-    # % Daily Value
-    c.setFont("Helvetica-Bold", 3)
-    c.drawRightString(nf_x + nf_width - 2, yp_nf, "% DV*")
-    yp_nf -= 1
-    c.line(nf_x + 2, yp_nf, nf_x + nf_width - 2, yp_nf)
-    yp_nf -= 4
-    
-    # Función auxiliar para dibujar nutrientes
-    def dn(label, campo, bold=True, indent=0):
-        nonlocal yp_nf
-        valor = p.get(campo, '')
-        dv = calc_dv(campo, valor)
-        c.setFont("Helvetica-Bold" if bold else "Helvetica", 4)
-        c.drawString(nf_x + 2 + indent, yp_nf, f"{label} {valor}")
-        if dv:
-            c.drawRightString(nf_x + nf_width - 2, yp_nf, f"{dv}%")
-        yp_nf -= 1
-        c.line(nf_x + 2, yp_nf, nf_x + nf_width - 2, yp_nf)
-        yp_nf -= 4
-    
-    # Nutrientes completos
-    dn("Total Fat", "Total_Fat")
-    dn("Saturated Fat", "Saturated_Fat", False, 5)
-    dn("Trans Fat", "Trans_Fat", False, 5)
-    dn("Cholesterol", "Cholesterol")
-    dn("Sodium", "Sodium")
-    dn("Total Carbohydrate", "Total_Carbohydrate")
-    dn("Dietary Fiber", "Dietary_Fiber", False, 5)
-    dn("Total Sugars", "Total_Sugars", False, 5)
-    dn(" Incl. Added Sugars", "Added_Sugars", False, 8)
-    
-    # Protein
-    c.setFont("Helvetica-Bold", 4)
-    pv = p.get('Protein', '')
-    pd = calc_dv('Protein', pv)
-    c.drawString(nf_x + 2, yp_nf, f"Protein {pv}")
-    if pd:
-        c.drawRightString(nf_x + nf_width - 2, yp_nf, f"{pd}%")
-    yp_nf -= 1
-    c.setLineWidth(1.2)
-    c.line(nf_x + 2, yp_nf, nf_x + nf_width - 2, yp_nf)
-    c.setLineWidth(0.3)
-    yp_nf -= 4
-    
-    # Micronutrientes
-    c.setFont("Helvetica", 4)
-    for campo, label in [('Vitamin_D', 'Vitamin D'), ('Calcium', 'Calcium'), 
-                          ('Iron', 'Iron'), ('Potassium', 'Potassium')]:
-        val = p.get(campo, '')
-        if val and str(val).strip() != 'None':
-            dv = calc_dv(campo, val)
-            c.drawString(nf_x + 2, yp_nf, f"{label} {val}")
-            if dv:
-                c.drawRightString(nf_x + nf_width - 2, yp_nf, f"{dv}%")
-            yp_nf -= 4
-    
-    # Leyenda del asterisco
-    yp_nf -= 1
-    c.setFont("Helvetica", 2.5)
-    texto = "* The % Daily Value tells you how much a nutrient in a serving contributes to a daily diet. 2000 cal a day is used for general nutrition advice."
-    max_width = nf_width - 4
-    linea = ""
-    for palabra in texto.split():
-        test = linea + palabra + " "
-        if c.stringWidth(test, "Helvetica", 2.5) < max_width:
-            linea = test
-        else:
-            c.drawString(nf_x + 2, yp_nf, linea.strip())
-            yp_nf -= 3
-            linea = palabra + " "
-    if linea:
-        c.drawString(nf_x + 2, yp_nf, linea.strip())
-    
-    # RESTAURAR EL ESTADO DEL CANVAS (deshacer la rotación)
-    c.restoreState()
-
 
 # ============================================================================
 # CLASE PRINCIPAL - INTERFAZ GRÁFICA
@@ -1351,7 +1010,6 @@ class EtiquetasApp(QMainWindow):
         self.tipo_combo.addItems([
             "Avery 8164 (6 por hoja - Vertical)",
             "Lacteo Avery 8164 (6 por hoja - Horizontal)",
-            "Lacteo San Julian (6 por hoja - Vertical rotada)",
             "PLS 504 (10 por hoja - Pequeña)"
         ])
         self.tipo_combo.setCurrentIndex(0)  # Por defecto en la opción vacía
@@ -1722,9 +1380,9 @@ class EtiquetasApp(QMainWindow):
         # Si no ha seleccionado tipo (índice 0), no calcular hojas
         if tipo_index == 0:
             hojas = 0
-        elif tipo_index == 4:  # PLS504 (ahora es índice 4)
+        elif tipo_index == 3:  # PLS504
             hojas = (total_etiquetas + 9) // 10
-        else:  # AVERY_8164, LACTEO_AVERY_8164, o LACTEO_SAN_JULIAN (todos 6 por hoja)
+        else:  # AVERY_8164 o LACTEO_AVERY_8164
             hojas = (total_etiquetas + 5) // 6
         
         self.lbl_productos_sel.setText(str(productos_sel))
@@ -1747,7 +1405,6 @@ class EtiquetasApp(QMainWindow):
                     "Por favor, elige:\n"
                     "• Avery 8164 (vertical)\n"
                     "• Lacteo Avery 8164 (horizontal)\n"
-                    "• Lacteo San Julian (vertical rotada)\n"
                     "• PLS 504 (pequeña)")
                 return
             
@@ -1772,9 +1429,7 @@ class EtiquetasApp(QMainWindow):
                 label_type = 'AVERY_8164'
             elif tipo_index == 2:
                 label_type = 'LACTEO_AVERY_8164'
-            elif tipo_index == 3:
-                label_type = 'LACTEO_SAN_JULIAN'
-            else:  # tipo_index == 4
+            else:  # tipo_index == 3
                 label_type = 'PLS504'
             
             cfg = LABEL_CONFIGS[label_type]
@@ -1810,8 +1465,6 @@ class EtiquetasApp(QMainWindow):
                 
                 if label_type == 'LACTEO_AVERY_8164':
                     dibujar_lacteo_avery(c, x, y, p, cfg)
-                elif label_type == 'LACTEO_SAN_JULIAN':
-                    dibujar_lacteo_san_julian(c, x, y, p, cfg)
                 elif label_type == 'PLS504':
                     dibujar_pls(c, x, y, p, cfg)
                 else:
