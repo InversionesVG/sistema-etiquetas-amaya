@@ -42,9 +42,25 @@ Antes de esta versión existían dos ubicaciones separadas: el repositorio Git r
 #### Origen
 - Diseñado y validado primero como prototipo (servidor web local + HTML) en una sesión de Cowork, con el producto Coco Rallado como caso de prueba, antes de migrarlo a esta aplicación de escritorio.
 
+#### 🪟 Script de actualización automática en Windows (`actualizar_sistema.bat`)
+Se agregó `actualizar_sistema.bat` en la raíz del repositorio para automatizar la actualización en la máquina de producción (Windows), en un solo doble clic:
+
+1. `git pull` — descarga el código más reciente desde GitHub
+2. `pip install -r requirements.txt` — instala/actualiza dependencias si hay alguna nueva
+3. `pyinstaller --onefile --windowed` — reconstruye `Generador_Etiquetas_Amaya.exe` con el código actualizado
+4. Cierra el programa si estaba abierto (`taskkill`) y reemplaza el `.exe` de producción en `C:\Sistema_Etiquetas\Generador_Etiquetas_Amaya.exe`
+
+Si cualquier paso falla (sin internet, error de pip, error de PyInstaller, o el `.exe` no se pudo reemplazar porque el programa seguía abierto), el script se detiene ahí mismo y muestra el motivo — no continúa con pasos a medias.
+
+**Flujo de trabajo a partir de ahora:**
+- Mac: `git push` cuando se termina una función nueva
+- Windows: doble clic en `actualizar_sistema.bat` → queda el código y el `.exe` actualizados
+
+Rutas configurables al inicio del script (`REPO_DIR`, `EXE_DESTINO`) por si algún día cambia la ubicación del repo o del ejecutable de producción en Windows.
+
 #### Observaciones Técnicas
 - Código agregado sin modificar funciones de dibujo existentes (`dibujar_avery`, `dibujar_lacteo_avery`, `dibujar_lacteo_san_julian`, `dibujar_pls`) ni la lógica de impresión (`mask`/`invariant`)
-- `git pull` en Windows solo actualiza el código fuente — el `.exe` de producción **no se actualiza solo**, hay que regenerarlo con PyInstaller después de cada `pull` (ver instrucciones de actualización más abajo en este archivo, sección "Instrucciones para actualizar versión")
+- `git pull` en Windows solo actualiza el código fuente — el `.exe` de producción **no se actualiza solo**, hay que regenerarlo con PyInstaller después de cada `pull` (esto es justamente lo que automatiza `actualizar_sistema.bat`)
 
 ---
 
