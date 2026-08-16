@@ -28,8 +28,8 @@ import re
 # ============================================================================
 # INFORMACIÓN DE VERSIÓN
 # ============================================================================
-VERSION = "1.2.0"  # Formato: MAYOR.MENOR.PARCHE
-VERSION_DATE = "Mayo 2026"
+VERSION = "1.3.0"  # Formato: MAYOR.MENOR.PARCHE
+VERSION_DATE = "Agosto 2026"
 
 # ============================================================================
 # CONFIGURACIÓN DE RUTAS (MULTIPLATAFORMA)
@@ -38,8 +38,10 @@ VERSION_DATE = "Mayo 2026"
 if platform.system() == "Windows":
     BASE_DIR = "C:/Sistema_Etiquetas"
 else:  # Mac/Linux
-    # En Mac, usar carpeta en el directorio del usuario
-    BASE_DIR = os.path.expanduser("~/Documents/Sistema_Etiquetas")
+    # AJUSTE v1.3.0: unificado con la carpeta única del proyecto (antes era
+    # ~/Documents/Sistema_Etiquetas, separada del código fuente). En Windows
+    # sigue igual (C:/Sistema_Etiquetas) - no se tocó esa parte a propósito.
+    BASE_DIR = os.path.expanduser("~/Documents/Python/Amaya_Labels")
 
 # Crear directorio si no existe
 if not os.path.exists(BASE_DIR):
@@ -79,6 +81,14 @@ LABEL_CONFIGS = {
         'width': 3 * inch, 'height': 2 * inch, 'columns': 2, 'rows': 5, 'per_page': 10,
         'margin_left': 1.20 * inch, 'margin_top': 0.3 * inch,
         'h_spacing': 0.15 * inch, 'v_spacing': 0 * inch,
+    },
+    'AVERY_5260': {
+        # "Dulces" - Avery 5260: 1" x 2-5/8", 3 columnas x 10 filas = 30 por hoja
+        # (specs oficiales Avery). Migrado desde el prototipo probado en Cowork
+        # (agosto 2026) junto con Coco Rallado.
+        'width': 2.625 * inch, 'height': 1 * inch, 'columns': 3, 'rows': 10, 'per_page': 30,
+        'margin_left': 0.1875 * inch, 'margin_top': 0.5 * inch,
+        'h_spacing': 0.125 * inch, 'v_spacing': 0 * inch,
     }
 }
 
@@ -103,6 +113,33 @@ def extraer_numero(t):
 def calc_dv(n, v):
     val = extraer_numero(v)
     return round((val / FDA_REF[n]) * 100) if n in FDA_REF and val > 0 else None
+
+def es_cero(valor):
+    """
+    True si el valor está vacío/None, o si el primer número que contiene es 0.
+    Se usa en AVERY_5260 (Dulces) para omitir filas de Nutrition Facts en 0
+    (p.ej. "0g", "0mg") y así aprovechar el espacio para lo que sí tiene valor.
+    NOTA: "<1g" NO se considera cero (el número detectado es 1), así que sí se muestra.
+    """
+    if valor is None:
+        return True
+    s = str(valor).strip()
+    if not s or s == 'None':
+        return True
+    m = re.search(r'(\d+\.?\d*)', s)
+    if not m:
+        return True
+    return float(m.group(1)) == 0
+
+def formatear_exp(valor):
+    """
+    Formatea Expiration_Date como MM/AAAA (ej. "EXP:12/2027"). Si Excel guardó la
+    celda como fecha, evita que salga con la hora pegada (ej. "2027-04-14 00:00:00").
+    Si ya viene como texto, se deja tal cual.
+    """
+    if isinstance(valor, datetime):
+        return valor.strftime('%m/%Y')
+    return str(valor) if valor not in (None, '') else ''
 
 # ============================================================================
 # FUNCIONES DE DIBUJO (de tu código original - las incluiré después)
@@ -1260,6 +1297,248 @@ def dibujar_lacteo_san_julian(c, x, y, p, cfg):
     c.restoreState()
 
 
+def wrap_texto(c, texto, fuente, tam, ancho_max, xi, ypos, interlinea, dibujar=True):
+    """
+    Dibuja texto con salto de línea automático. Devuelve la posición Y final.
+    Con dibujar=False no escribe nada (solo calcula el alto que ocuparía) - se usa
+    para medir el bloque de texto antes de centrarlo verticalmente (ver AVERY_5260).
+    """
+    c.setFont(fuente, tam)
+    linea = ""
+    for palabra in str(texto).split():
+        test = linea + palabra + " "
+        if c.stringWidth(test, fuente, tam) < ancho_max:
+            linea = test
+        else:
+            if dibujar:
+                c.drawString(xi, ypos, linea.strip())
+            ypos -= interlinea
+            linea = palabra + " "
+    if linea:
+        if dibujar:
+            c.drawString(xi, ypos, linea.strip())
+        ypos -= interlinea
+    return ypos
+
+
+def dibujar_avery5260(c, x, y, p, cfg):
+    """
+    AVERY 5260 ("Dulces") - 1" x 2-5/8" - Etiqueta de identificación + Nutrition
+    Facts compacta. Migrada desde el prototipo probado e impreso en papel real
+    en Cowork (agosto 2026), empezando con el producto Coco Rallado.
+
+    Esta etiqueta NO tiene que cumplir la restricción de tamaño mínimo de fuente
+    de la FDA (21 CFR 101.9 exige 14pt mínimo en Nutrition Facts) porque no se usa
+    para ese fin - por eso el texto va en 3.6-6.5pt.
+
+    Layout: columna izquierda (nombre, INGREDIENTS, Distributed by fijo +
+    Imported_By del Excel, Net Wt/EXP, teléfonos/correo) + columna derecha con
+    Nutrition Facts, separadas por 2 líneas verticales delgadas (0.4pt) + 1 línea
+    horizontal arriba cerrando el cuadro. Ninguna línea llega al borde físico de
+    la etiqueta (para que no se corte al imprimir/recortar).
+
+    Los nutrientes en 0 (o vacíos) se omiten (ver es_cero()); las filas que sí
+    quedan se reparten para ocupar todo el alto de la columna de Nutrition Facts,
+    reduciendo el tamaño de letra automáticamente (mínimo 2.6pt) solo si hacen
+    falta muchas filas. La columna izquierda va centrada verticalmente (se mide
+    el bloque de texto antes de dibujarlo) para que no se corte al despegar la
+    etiqueta - la columna de Nutrition Facts se probó centrada igual pero se
+    descartó porque obligaba a achicar más la letra, así que se dejó a todo el
+    alto de la etiqueta.
+    """
+    c.setFillColor(black)
+    c.setStrokeColor(black)
+
+    nf_width = 0.90 * inch
+    gap = 0.05 * inch
+    right_margin = 0.07 * inch
+    nf_x = x + cfg['width'] - right_margin - nf_width
+    left_x = x + 0.10 * inch
+    left_width = cfg['width'] - nf_width - gap - 0.08 * inch
+
+    # ---------- COLUMNA IZQUIERDA (centrada verticalmente) ----------
+    def dibujar_columna_izquierda(yp_inicial, dibujar=True):
+        yp = yp_inicial
+
+        nombre = str(p.get('Product_Name', '') or '').strip()
+        if dibujar:
+            c.setFont("Helvetica-Bold", 6.5)
+            c.drawString(left_x, yp, nombre)
+        yp -= 6.5
+
+        nombre_eng = p.get('Product_Name_English', '')
+        if nombre_eng and str(nombre_eng).strip() not in ('', 'None'):
+            if dibujar:
+                c.setFont("Helvetica-Oblique", 5)
+                c.drawString(left_x, yp, str(nombre_eng).strip())
+            yp -= 6
+
+        ingredientes = p.get('Ingredients', '')
+        if ingredientes and str(ingredientes).strip() not in ('', 'None'):
+            if dibujar:
+                c.setFont("Helvetica-Bold", 4.2)
+                c.drawString(left_x, yp, "INGREDIENTS:")
+            yp -= 4.5
+            yp = wrap_texto(c, ingredientes, "Helvetica", 4, left_width, left_x, yp, 4.2, dibujar)
+
+        yp -= 1
+        if dibujar:
+            c.setFont("Helvetica-Bold", 4)
+            c.drawString(left_x, yp, "Distributed by:")
+        yp -= 4
+        if dibujar:
+            c.setFont("Helvetica", 3.7)
+            c.drawString(left_x, yp, "Amaya Express Int'l, 472 Somerset St,")
+        yp -= 3.9
+        if dibujar:
+            c.drawString(left_x, yp, "North Plainfield, NJ 06070")
+        yp -= 4.3
+
+        imported_by = p.get('Imported_By', '')
+        if imported_by and str(imported_by).strip() not in ('', 'None'):
+            if dibujar:
+                c.setFont("Helvetica-Bold", 4)
+                c.drawString(left_x, yp, "Imported by:")
+            yp -= 4
+            if dibujar:
+                c.setFont("Helvetica", 3.7)
+            for parte in str(imported_by).split(',')[:2]:
+                if dibujar:
+                    c.drawString(left_x, yp, parte.strip())
+                yp -= 3.9
+
+        net_weight = p.get('Net_Weight', '')
+        exp = p.get('Expiration_Date', '')
+        pie = []
+        if net_weight and str(net_weight).strip() not in ('', 'None'):
+            pie.append(f"Net Wt: {net_weight}")
+        if exp and str(exp).strip() not in ('', 'None'):
+            pie.append(f"EXP: {formatear_exp(exp)}")
+        if pie:
+            yp -= 1
+            if dibujar:
+                c.setFont("Helvetica-Bold", 4.2)
+                c.drawString(left_x, yp, "   ".join(pie))
+            yp -= 4.5
+
+        if dibujar:
+            c.setFont("Helvetica", 3.6)
+            c.drawString(left_x, yp, "(908) 405-5553 / (908) 405-3072")
+        yp -= 3.8
+        if dibujar:
+            c.drawString(left_x, yp, "amayaexpress21@gmail.com")
+
+        return yp
+
+    # 1) Medir el alto real del bloque (sin dibujar nada)
+    yp_final_medido = dibujar_columna_izquierda(0, dibujar=False)
+    alto_columna_izquierda = 0 - yp_final_medido
+
+    # 2) Margen simétrico arriba/abajo dentro de la etiqueta (mínimo 2pt de seguridad)
+    margen_vertical = max((cfg['height'] - alto_columna_izquierda) / 2, 2)
+
+    # 3) Dibujar de verdad, ya centrado
+    dibujar_columna_izquierda(y + cfg['height'] - margen_vertical, dibujar=True)
+
+    # ---------- COLUMNA NUTRITION FACTS (todo el alto de la etiqueta) ----------
+    nf_top = y + cfg['height']
+    nf_bottom = y
+    linea_vertical_top = nf_top - 1.5  # el final se calcula después de dibujar las filas
+
+    # Línea horizontal de arriba, cerrando el cuadro junto con las dos verticales
+    c.setLineWidth(0.4)
+    c.line(nf_x - gap / 2, linea_vertical_top,
+           nf_x + nf_width + right_margin / 2, linea_vertical_top)
+
+    yp_nf = nf_top - 6.5
+    c.setFont("Helvetica-Bold", 6)
+    c.drawString(nf_x, yp_nf, "Nutrition Facts")
+    yp_nf -= 6
+
+    serving_size = p.get('Serving_Size', '')
+    if serving_size and str(serving_size).strip() not in ('', 'None'):
+        c.setFont("Helvetica", 3.6)
+        c.drawString(nf_x, yp_nf, f"Serving Size {serving_size}")
+        yp_nf -= 4
+
+    c.setLineWidth(1)
+    c.line(nf_x, yp_nf, nf_x + nf_width, yp_nf)
+    yp_nf -= 4.5
+
+    calories = p.get('Calories', '')
+    if calories and str(calories).strip() not in ('', 'None'):
+        c.setFont("Helvetica-Bold", 6)
+        c.drawString(nf_x, yp_nf, "Calories")
+        c.drawString(nf_x + 32, yp_nf, str(calories))
+        yp_nf -= 2
+        c.setLineWidth(1.8)
+        c.line(nf_x, yp_nf, nf_x + nf_width, yp_nf)
+        yp_nf -= 4
+
+    c.setFont("Helvetica-Bold", 3.3)
+    c.drawRightString(nf_x + nf_width, yp_nf, "% DV*")
+    yp_nf -= 3.5
+
+    header_bottom = yp_nf  # a partir de aquí se reparten las filas de nutrientes
+
+    filas = [
+        ("Total Fat", "Total_Fat", True, 0),
+        ("Sat. Fat", "Saturated_Fat", False, 4),
+        ("Trans Fat", "Trans_Fat", False, 4),
+        ("Cholesterol", "Cholesterol", True, 0),
+        ("Sodium", "Sodium", True, 0),
+        ("Total Carb.", "Total_Carbohydrate", True, 0),
+        ("Fiber", "Dietary_Fiber", False, 4),
+        ("Sugars", "Total_Sugars", False, 4),
+        ("  Added Sugars", "Added_Sugars", False, 6),
+        ("Protein", "Protein", True, 0),
+        ("Vitamin D", "Vitamin_D", False, 0),
+        ("Calcium", "Calcium", False, 0),
+        ("Iron", "Iron", False, 0),
+        ("Potassium", "Potassium", False, 0),
+    ]
+    filas_visibles = [f for f in filas if not es_cero(p.get(f[1], ''))]
+
+    n = len(filas_visibles)
+    if n:
+        espacio_disponible = max(header_bottom - nf_bottom - 2, 0)
+
+        # Cada fila necesita un mínimo de espacio para que el texto no choque con
+        # la línea divisoria de abajo. Empezamos en 3.6pt y solo achicamos la letra
+        # si con muchos nutrientes no alcanza el alto disponible; nunca bajamos de 2.6pt.
+        tam_fuente = 3.6
+        pre_linea = 0.9
+        post_linea_min = tam_fuente
+        while n * (pre_linea + post_linea_min) > espacio_disponible and tam_fuente > 2.6:
+            tam_fuente -= 0.1
+            post_linea_min = tam_fuente
+
+        paso = espacio_disponible / n
+        post_linea = max(post_linea_min, paso - pre_linea)
+
+        y_fila = header_bottom
+        for label, campo, bold, indent in filas_visibles:
+            valor = p.get(campo, '')
+            dv = calc_dv(campo, valor)
+            c.setFont("Helvetica-Bold" if bold else "Helvetica", tam_fuente)
+            c.drawString(nf_x + indent, y_fila, f"{label} {valor}")
+            if dv:
+                c.drawRightString(nf_x + nf_width, y_fila, f"{dv}%")
+            y_fila -= pre_linea
+            c.setLineWidth(0.3)
+            c.line(nf_x, y_fila, nf_x + nf_width, y_fila)
+            y_fila -= post_linea
+        linea_vertical_bottom = y_fila + post_linea
+    else:
+        linea_vertical_bottom = header_bottom
+
+    # Separadores verticales (izquierda y derecha), solo del alto del contenido real
+    c.setLineWidth(0.4)
+    c.line(nf_x - gap / 2, linea_vertical_bottom, nf_x - gap / 2, linea_vertical_top)
+    c.line(nf_x + nf_width + right_margin / 2, linea_vertical_bottom,
+           nf_x + nf_width + right_margin / 2, linea_vertical_top)
+
+
 # ============================================================================
 # CLASE PRINCIPAL - INTERFAZ GRÁFICA
 # ============================================================================
@@ -1352,7 +1631,8 @@ class EtiquetasApp(QMainWindow):
             "Avery 8164 (6 por hoja - Vertical)",
             "Lacteo Avery 8164 (6 por hoja - Horizontal)",
             "Lacteo San Julian (6 por hoja - Vertical rotada)",
-            "PLS 504 (10 por hoja - Pequeña)"
+            "PLS 504 (10 por hoja - Pequeña)",
+            "Dulces - Avery 5260 (30 por hoja)"
         ])
         self.tipo_combo.setCurrentIndex(0)  # Por defecto en la opción vacía
         self.tipo_combo.setFont(QFont("Arial", 11))
@@ -1722,8 +2002,10 @@ class EtiquetasApp(QMainWindow):
         # Si no ha seleccionado tipo (índice 0), no calcular hojas
         if tipo_index == 0:
             hojas = 0
-        elif tipo_index == 4:  # PLS504 (ahora es índice 4)
+        elif tipo_index == 4:  # PLS504
             hojas = (total_etiquetas + 9) // 10
+        elif tipo_index == 5:  # Dulces - Avery 5260 (30 por hoja)
+            hojas = (total_etiquetas + 29) // 30
         else:  # AVERY_8164, LACTEO_AVERY_8164, o LACTEO_SAN_JULIAN (todos 6 por hoja)
             hojas = (total_etiquetas + 5) // 6
         
@@ -1748,7 +2030,8 @@ class EtiquetasApp(QMainWindow):
                     "• Avery 8164 (vertical)\n"
                     "• Lacteo Avery 8164 (horizontal)\n"
                     "• Lacteo San Julian (vertical rotada)\n"
-                    "• PLS 504 (pequeña)")
+                    "• PLS 504 (pequeña)\n"
+                    "• Dulces - Avery 5260")
                 return
             
             # Obtener productos seleccionados
@@ -1774,8 +2057,10 @@ class EtiquetasApp(QMainWindow):
                 label_type = 'LACTEO_AVERY_8164'
             elif tipo_index == 3:
                 label_type = 'LACTEO_SAN_JULIAN'
-            else:  # tipo_index == 4
+            elif tipo_index == 4:
                 label_type = 'PLS504'
+            else:  # tipo_index == 5
+                label_type = 'AVERY_5260'
             
             cfg = LABEL_CONFIGS[label_type]
             
@@ -1814,6 +2099,8 @@ class EtiquetasApp(QMainWindow):
                     dibujar_lacteo_san_julian(c, x, y, p, cfg)
                 elif label_type == 'PLS504':
                     dibujar_pls(c, x, y, p, cfg)
+                elif label_type == 'AVERY_5260':
+                    dibujar_avery5260(c, x, y, p, cfg)
                 else:
                     dibujar_avery(c, x, y, p, cfg)
             

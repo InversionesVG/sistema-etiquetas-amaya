@@ -1,10 +1,10 @@
 # 🏷️ Sistema de Generación de Etiquetas FDA - Amaya Express
 
-Sistema profesional para generar etiquetas nutricionales FDA en formatos Avery 8164, Lácteo Avery 8164, Lácteo San Julián y PLS 504.
+Sistema profesional para generar etiquetas nutricionales FDA en formatos Avery 8164, Lácteo Avery 8164, Lácteo San Julián, PLS 504 y Dulces (Avery 5260).
 
 ![Python](https://img.shields.io/badge/python-3.8+-blue.svg)
 ![PyQt5](https://img.shields.io/badge/PyQt5-5.15-green.svg)
-![Version](https://img.shields.io/badge/version-1.2.0-brightgreen.svg)
+![Version](https://img.shields.io/badge/version-1.3.0-brightgreen.svg)
 ![License](https://img.shields.io/badge/license-Privado-red.svg)
 
 ---
@@ -17,7 +17,7 @@ Aplicación de escritorio con interfaz gráfica (GUI) que permite:
 - ✅ Elegir cantidades y tipo de etiqueta
 - ✅ Validación obligatoria de tipo de etiqueta
 - ✅ Generar PDFs listos para imprimir
-- ✅ Soporta 4 tipos de etiquetas (Avery 8164, Lácteo Avery, Lácteo San Julián, PLS 504)
+- ✅ Soporta 5 tipos de etiquetas (Avery 8164, Lácteo Avery, Lácteo San Julián, PLS 504, Dulces - Avery 5260)
 - ✅ PDFs temporales (no se acumulan archivos)
 - ✅ Compatible con Windows y Mac
 - ✅ Control de versiones integrado
@@ -57,6 +57,16 @@ Aplicación de escritorio con interfaz gráfica (GUI) que permite:
 - Tamaño: 3" × 2"
 - 10 etiquetas por hoja (2 columnas × 5 filas)
 - Diseño compacto
+
+### 5. **Dulces - Avery 5260** 🆕
+- Tamaño: 1" × 2⅝" (specs oficiales Avery 5260)
+- 30 etiquetas por hoja (3 columnas × 10 filas)
+- Etiqueta de identificación + Nutrition Facts compacta (sin fondos ni logo)
+- **No aplica la restricción de tamaño mínimo de fuente de la FDA** (no se usa con ese fin) - texto en 3.6-6.5pt
+- Nutrientes en 0 se omiten automáticamente para aprovechar el espacio
+- Columna izquierda (nombre/ingredientes/distribuidor) centrada verticalmente
+- Nutrition Facts a todo el alto de la etiqueta, con letra que se achica sola si hacen falta muchas filas
+- Fecha de vencimiento en formato MM/AAAA
 
 ---
 
@@ -264,7 +274,7 @@ El archivo `Base_Datos_Etiquetas_FDA.xlsx` debe tener una hoja llamada **"Produc
    - En el header (esquina superior derecha): `v1.0.0`
 
 3. **Seleccionar tipo de etiqueta:** ⚠️ **OBLIGATORIO**
-   - Elegir entre: Avery 8164, Lacteo Avery 8164, o PLS 504
+   - Elegir entre: Avery 8164, Lacteo Avery 8164, Lacteo San Julian, PLS 504, o Dulces (Avery 5260)
 
 4. **Buscar productos (opcional):**
    - Usar el campo de búsqueda para filtrar por nombre
@@ -611,7 +621,7 @@ El archivo `Base_Datos_Etiquetas_FDA.xlsx` debe tener una hoja llamada **"Produc
    - Mac: `python3 generador_etiquetas_gui.py` en Terminal
 
 2. **Seleccionar tipo de etiqueta:**
-   - Elegir entre: Avery 8164, Lacteo Avery 8164, o PLS 504
+   - Elegir entre: Avery 8164, Lacteo Avery 8164, Lacteo San Julian, PLS 504, o Dulces (Avery 5260)
    - ⚠️ **OBLIGATORIO** antes de generar PDF
 
 3. **Buscar productos (opcional):**

@@ -7,6 +7,36 @@ y este proyecto adhiere a [Versionamiento Semántico](https://semver.org/lang/es
 
 ---
 
+## [1.3.0] - 2026-08-16
+
+### 🎉 Nueva Etiqueta: Dulces (Avery 5260)
+
+#### Agregado
+- ✅ **Nuevo tipo de etiqueta:** Dulces - Avery 5260 (30 por hoja - 1" x 2-5/8")
+- ✅ **3 columnas x 10 filas por hoja** (specs oficiales Avery 5260: margin_left 0.1875", margin_top 0.5", h_spacing 0.125", v_spacing 0")
+- ✅ **Nutrition Facts SIN la restricción de tamaño mínimo de fuente de la FDA** (21 CFR 101.9 exige 14pt) porque esta etiqueta no se usa para ese fin - texto en 3.6-6.5pt
+- ✅ **Omisión automática de nutrientes en 0** (función `es_cero()`): valores como "0g"/"0mg" no ocupan espacio; celdas vacías también se omiten
+- ✅ **Nutrition Facts a todo el alto de la etiqueta**, con letra que se achica automáticamente (mínimo 2.6pt) solo si hay demasiados nutrientes para 3.6pt
+- ✅ **Columna izquierda (nombre/ingredientes/distribuidor) centrada verticalmente** dentro de la etiqueta - se mide el bloque antes de dibujarlo (función `wrap_texto()` con modo medición) para que no se corte el texto al despegar la etiqueta
+- ✅ **Formato de fecha de vencimiento MM/AAAA** (función `formatear_exp()`) para que no salga con la hora pegada
+- ✅ **Nueva función:** `dibujar_avery5260()`
+- ✅ **Nueva configuración:** `AVERY_5260` en LABEL_CONFIGS
+- ✅ Probado impreso en papel real (Epson ET-2988) sobre plantilla Avery 5260 antes de integrarse aquí
+
+#### Cambiado
+- Versión actualizada a 1.3.0
+- Combo box de tipo de etiqueta: nueva opción en índice 5 ("Dulces - Avery 5260")
+- Cálculo de hojas actualizado para incluir Dulces (30 por hoja)
+- Mensajes de validación actualizados con el nuevo tipo
+
+#### Origen
+- Diseñado y validado primero como prototipo (servidor web local + HTML) en una sesión de Cowork, con el producto Coco Rallado como caso de prueba, antes de migrarlo a esta aplicación de escritorio.
+
+#### Observaciones Técnicas
+- Código agregado sin modificar funciones de dibujo existentes (`dibujar_avery`, `dibujar_lacteo_avery`, `dibujar_lacteo_san_julian`, `dibujar_pls`) ni la lógica de impresión (`mask`/`invariant`)
+
+---
+
 ## [1.2.0] - 2026-05-07
 
 ### 🎉 Nueva Etiqueta: Lacteo San Julian

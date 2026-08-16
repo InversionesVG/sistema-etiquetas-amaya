@@ -48,6 +48,8 @@ Etiquetas_Para_Imprimir.xlsx
 # Archivos específicos del usuario
 # NO subir el Excel con datos reales del cliente
 Base_Datos_Etiquetas_FDA.xlsx
+Base_Datos_Etiquetas_FDAOLD.xlsx
+~$*.xlsx
 
 # Mantener solo el ejemplo
 !Base_Datos_Etiquetas_FDA_EJEMPLO.xlsx
