@@ -101,7 +101,7 @@ Aplicación de escritorio con interfaz gráfica (GUI) que permite:
    
    **IMPORTANTE:** En Mac la ruta es:
    ```
-   ~/Documents/Sistema_Etiquetas/Win/
+   ~/Documents/Python/Amaya_Labels/
    ```
 
 3. **Copiar todos los archivos a esa carpeta**
@@ -157,8 +157,8 @@ Aplicación de escritorio con interfaz gráfica (GUI) que permite:
 
 1. **Clonar repositorio:**
    ```bash
-   mkdir -p ~/Documents/Sistema_Etiquetas
-   cd ~/Documents/Sistema_Etiquetas
+   mkdir -p ~/Documents/Python/Amaya_Labels
+   cd ~/Documents/Python/Amaya_Labels
    git clone https://github.com/TU_USUARIO/sistema-etiquetas-amaya.git Win
    cd Win
    ```
@@ -169,7 +169,7 @@ Aplicación de escritorio con interfaz gráfica (GUI) que permite:
    ```
 
 3. **Configurar archivos:**
-   - Copia los siguientes archivos a `~/Documents/Sistema_Etiquetas/Win/`:
+   - Copia los siguientes archivos a `~/Documents/Python/Amaya_Labels/`:
      - `Base_Datos_Etiquetas_FDA.xlsx`
      - `Amaya_Imagen.png`
      - `Flag_El_Salvador.png`
@@ -179,7 +179,7 @@ Aplicación de escritorio con interfaz gráfica (GUI) que permite:
      - `Sello_Verde_San_Julian.png` 🆕
      - `Fondo_Azul_San_Julian.png` 🆕
    
-   **Nota:** La ruta correcta es `~/Documents/Sistema_Etiquetas/Win/` (no `~/Sistema_Etiquetas/`)
+   **Nota:** La ruta correcta es `~/Documents/Python/Amaya_Labels/` (carpeta única del proyecto en Mac)
 
 4. **Ejecutar:**
    ```bash
@@ -193,7 +193,7 @@ Aplicación de escritorio con interfaz gráfica (GUI) que permite:
 ### **Para Usuario Final:**
 ```
 C:\Sistema_Etiquetas\  (Windows)
-~/Documents/Sistema_Etiquetas/Win/  (Mac)
+~/Documents/Python/Amaya_Labels/  (Mac)
 ├── Generador_Etiquetas_Amaya.exe      ← Ejecutable (solo Windows)
 ├── Base_Datos_Etiquetas_FDA.xlsx      ← Base de datos
 ├── Amaya_Imagen.png                   ← Logo Amaya
@@ -218,7 +218,7 @@ sistema-etiquetas-amaya/
 ### **Archivos Necesarios (NO incluidos en Git por seguridad):**
 
 **Windows:** `C:\Sistema_Etiquetas\`  
-**Mac:** `~/Sistema_Etiquetas/`
+**Mac:** `~/Documents/Python/Amaya_Labels/`
 
 - `Base_Datos_Etiquetas_FDA.xlsx` - Base de datos de productos
 - `Amaya_Imagen.png` - Logo corporativo
@@ -303,7 +303,7 @@ El archivo `Base_Datos_Etiquetas_FDA.xlsx` debe tener una hoja llamada **"Produc
 ### **Error: "No se encontró el archivo Excel"**
 - Verifica que `Base_Datos_Etiquetas_FDA.xlsx` esté en la carpeta correcta
 - Windows: `C:\Sistema_Etiquetas\`
-- Mac: `~/Sistema_Etiquetas/`
+- Mac: `~/Documents/Python/Amaya_Labels/`
 
 ### **Error: "No module named 'PyQt5'"** (solo desarrollo)
 ```bash
@@ -543,13 +543,13 @@ Ver archivo `CHANGELOG.md` para historial completo de versiones.
    ```
 
 3. **Configurar archivos:**
-   - Copia tus archivos a `~/Sistema_Etiquetas/`:
+   - Copia tus archivos a `~/Documents/Python/Amaya_Labels/`:
      ```bash
-     mkdir -p ~/Sistema_Etiquetas
-     cp Base_Datos_Etiquetas_FDA.xlsx ~/Sistema_Etiquetas/
-     cp Amaya_Imagen.png ~/Sistema_Etiquetas/
-     cp Fondo_Superior.png ~/Sistema_Etiquetas/
-     cp Fondo_Inferior.png ~/Sistema_Etiquetas/
+     mkdir -p ~/Documents/Python/Amaya_Labels
+     cp Base_Datos_Etiquetas_FDA.xlsx ~/Documents/Python/Amaya_Labels/
+     cp Amaya_Imagen.png ~/Documents/Python/Amaya_Labels/
+     cp Fondo_Superior.png ~/Documents/Python/Amaya_Labels/
+     cp Fondo_Inferior.png ~/Documents/Python/Amaya_Labels/
      ```
 
 4. **Ejecutar:**
@@ -573,7 +573,7 @@ sistema-etiquetas-amaya/
 Debes tener estos archivos en tu carpeta de trabajo:
 
 **Windows:** `C:\Sistema_Etiquetas\`  
-**Mac:** `~/Sistema_Etiquetas/`
+**Mac:** `~/Documents/Python/Amaya_Labels/`
 
 - `Base_Datos_Etiquetas_FDA.xlsx` - Base de datos de productos
 - `Amaya_Imagen.png` - Logo corporativo
@@ -647,7 +647,7 @@ El archivo `Base_Datos_Etiquetas_FDA.xlsx` debe tener una hoja llamada **"Produc
 ### **Error: "No se encontró el archivo Excel"**
 - Verifica que `Base_Datos_Etiquetas_FDA.xlsx` esté en la carpeta correcta
 - Windows: `C:\Sistema_Etiquetas\`
-- Mac: `~/Sistema_Etiquetas/`
+- Mac: `~/Documents/Python/Amaya_Labels/`
 
 ### **Error: "No module named 'PyQt5'"**
 ```bash

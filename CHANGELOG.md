@@ -29,11 +29,22 @@ y este proyecto adhiere a [Versionamiento Semántico](https://semver.org/lang/es
 - Cálculo de hojas actualizado para incluir Dulces (30 por hoja)
 - Mensajes de validación actualizados con el nuevo tipo
 
+#### 📁 Unificación de carpeta del proyecto (Mac)
+Antes de esta versión existían dos ubicaciones separadas: el repositorio Git real (`~/Documents/Sistema_Etiquetas/Win/`, con la app de escritorio PyQt5 que se usa en producción) y una carpeta aparte (`~/Documents/Python/Amaya_Labels`) usada para prototipar "Dulces" en una sesión de Cowork con un script independiente (reportlab + HTML). Como es un solo sistema, se unificaron en una sola carpeta:
+
+- **Nueva ubicación única del proyecto en Mac:** `~/Documents/Python/Amaya_Labels` (ahí vive el repositorio Git completo desde ahora)
+- `BASE_DIR` en `generador_etiquetas_gui.py` actualizado **solo en la rama Mac** de `platform.system()`: de `~/Documents/Sistema_Etiquetas` a `~/Documents/Python/Amaya_Labels`
+- **En Windows no cambió nada:** `BASE_DIR` sigue siendo `C:/Sistema_Etiquetas` (decisión explícita, para no romper la ruta de producción)
+- La carpeta vieja `~/Documents/Sistema_Etiquetas` se conservó como respaldo, renombrada a `Sistema_Etiquetas_NOACTUAL` (no se borró nada)
+- Los 4 archivos del prototipo web original de Dulces (`README_SISTEMA.md`, `Selector_Etiquetas.html`, `generador_etiquetas.py`, `generar_pdf_etiquetas.py`) se archivaron sin borrar en la subcarpeta `Prototipo_Web_Dulces/`, solo como referencia histórica del diseño validado — ya no se usan ni se ejecutan
+- Se agregaron a Git 4 imágenes que ya se usaban en la etiqueta San Julián pero que no estaban versionadas: `Flag_El_Salvador.png`, `Fondo_Azul_San_Julian.png`, `Logo_San_Julian_Vaca.png`, `Sello_Verde_San_Julian.png`
+
 #### Origen
 - Diseñado y validado primero como prototipo (servidor web local + HTML) en una sesión de Cowork, con el producto Coco Rallado como caso de prueba, antes de migrarlo a esta aplicación de escritorio.
 
 #### Observaciones Técnicas
 - Código agregado sin modificar funciones de dibujo existentes (`dibujar_avery`, `dibujar_lacteo_avery`, `dibujar_lacteo_san_julian`, `dibujar_pls`) ni la lógica de impresión (`mask`/`invariant`)
+- `git pull` en Windows solo actualiza el código fuente — el `.exe` de producción **no se actualiza solo**, hay que regenerarlo con PyInstaller después de cada `pull` (ver instrucciones de actualización más abajo en este archivo, sección "Instrucciones para actualizar versión")
 
 ---
 
