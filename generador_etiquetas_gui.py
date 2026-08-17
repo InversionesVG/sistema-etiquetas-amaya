@@ -28,7 +28,7 @@ import re
 # ============================================================================
 # INFORMACIÓN DE VERSIÓN
 # ============================================================================
-VERSION = "1.3.0"  # Formato: MAYOR.MENOR.PARCHE
+VERSION = "1.3.1"  # Formato: MAYOR.MENOR.PARCHE
 VERSION_DATE = "Agosto 2026"
 
 # ============================================================================
@@ -2075,7 +2075,19 @@ class EtiquetasApp(QMainWindow):
             # Metadata
             c.setAuthor(f"Amaya_{timestamp}")
             c.setTitle(f"Etiquetas_FDA_{timestamp}")
-            
+
+            # AJUSTE v1.3.1: le decimos al visor de PDF que NO aplique ningún
+            # escalado automático al imprimir (equivale a dejar preseleccionado
+            # "Tamaño real / Actual Size" en vez de "Ajustar a la página").
+            # Esto es lo que causaba el desfase progresivo en Dulces (Avery 5260):
+            # con v_spacing 0 no había tolerancia para el pequeño achicamiento
+            # que aplicaba el visor, y se notaba a partir de la fila 7.
+            # Nota: es una preferencia del PDF (ViewerPreferences/PrintScaling);
+            # Adobe Reader la respeta siempre, hay que confirmar en producción
+            # que el visor de Edge/Chrome de la máquina de Windows también la
+            # respete.
+            c.setViewerPreference('PrintScaling', 'None')
+
             # Calcular posiciones
             pos = []
             for f in range(cfg['rows']):

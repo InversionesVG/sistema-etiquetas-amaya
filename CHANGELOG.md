@@ -7,6 +7,20 @@ y este proyecto adhiere a [Versionamiento Semántico](https://semver.org/lang/es
 
 ---
 
+## [1.3.1] - 2026-08-17
+
+### 🐛 Fix: Desfase de impresión en Dulces (Avery 5260)
+
+#### Corregido
+- 🐛 **Desfase progresivo al imprimir en Windows**, visible desde la fila 7 en adelante (30 por hoja), tan grave que en la fila 10 el título se imprimía encima de la fila 9. Causa: el visor de PDF (Edge/Chrome) tenía seleccionado "Ajustar a la página", que aplica un pequeño escalado automático; como `AVERY_5260` tiene `v_spacing: 0` (sin margen de tolerancia entre filas), ese escalado se acumulaba fila por fila hasta volverse visible.
+- ✅ **Solución de fondo:** se agregó `c.setViewerPreference('PrintScaling', 'None')` al generar el PDF (`generar_pdf()`), que le indica al visor que no debe escalar nada al imprimir — equivale a dejar preseleccionado "Tamaño real / Actual Size" en vez de "Ajustar a la página", para que el operario no tenga que cambiarlo manualmente cada vez.
+- ⚠️ **Pendiente de confirmar en producción:** esta preferencia es parte del estándar PDF (`ViewerPreferences`) y Adobe Reader siempre la respeta; falta confirmar que el visor integrado de Edge/Chrome en la máquina de Windows de producción también la respete. Mientras tanto, seleccionar manualmente "Tamaño real / Actual Size" en el diálogo de impresión sigue siendo la solución que ya se probó y funcionó.
+
+#### Cambiado
+- Versión actualizada a 1.3.1
+
+---
+
 ## [1.3.0] - 2026-08-16
 
 ### 🎉 Nueva Etiqueta: Dulces (Avery 5260)
